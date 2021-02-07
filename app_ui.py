@@ -17,12 +17,11 @@ class Window(Frame):
 
     def initUI(self):
         self.master.title("Algorithm Visualization")
-        self.master.config(bg="#333")
         self.master.maxsize(700,600)
         self.master.minsize(700,600)
 
         # design UI FRAME For Buttons and Inputs
-        self.ui_frame = Frame(self.master, width="700", height="100", bg="white")
+        self.ui_frame = Frame(self.master, width="700", height="100")
         self.ui_frame.grid(row=0,column=0, padx=0, pady=0)
 
         #canvas for plot shapes on it
@@ -62,7 +61,7 @@ class Window(Frame):
         self.array.clear()
 
         for i in range(int(self.algo_combo_box_size.get())):
-            rand_num = randint(0,100) # generate random number every time
+            rand_num = randint(50,200) # generate random number every time
             self.array.append(rand_num)
 
         colorArray = ["#333" for i in range(0,len(self.array))]
@@ -136,12 +135,33 @@ class Window(Frame):
             time.sleep(0.2)
 
 
-    def partition(self):
-        pass 
-    def quick_sort(self):
-        print("Quick Sort")
+    def partition(self, low, high):
 
-    
+        pivot_element = self.array[high] # pick last element as pivot
+        i = (low-1) # index o smallest element
+
+        for j in range(low,high):
+            if self.array[j] < pivot_element:
+                i = i + 1 # increment index of smallest element
+                self.array[i] , self.array[j] = self.array[j], self.array[i]
+                current_color = [ "blue" if k == j   else "#333" for k in range(0,len(self.array))]
+                self.draw_blocks(current_color)
+                time.sleep(0.2)
+
+        self.array[i+1], self.array[high] = self.array[high], self.array[i+1]
+        current_color = [ "blue" if k == i  else "#333" for k in range(0,len(self.array))]
+        self.draw_blocks(current_color)
+        time.sleep(0.2)
+        return i + 1 # return index of pivot element
+        
+
+    def quick_sort(self, low, high):
+        
+        if low < high:
+            pivot = self.partition(low,high) # index of pivot element
+            self.quick_sort(low,pivot-1) # before pivot element
+            self.quick_sort(pivot+1,high) # after pivot element
+
     def merge_sort(self):
         pass 
 
@@ -158,7 +178,8 @@ class Window(Frame):
         elif self.algo_combo_box.get() == "Selection Sort":
             self.selection_sort()
         elif self.algo_combo_box.get() == "Quick Sort":
-            self.quick_sort()
+            self.quick_sort(0,len(self.array)-1)
+            print(self.array)
         elif self.algo_combo_box.get() == "Merge Sort":
             self.merge_sort()
         
