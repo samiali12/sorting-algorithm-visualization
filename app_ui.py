@@ -1,7 +1,8 @@
 from  tkinter import * 
 from  tkinter.ttk import Combobox
-from  random import randint
+from  random import sample
 import time
+import sys
 
 class Window(Frame):
 
@@ -59,10 +60,11 @@ class Window(Frame):
     def generate(self):
 
         self.array.clear()
+        length = int(self.algo_combo_box_size.get())
+        num_list = sample(range(100,400),length)
 
-        for i in range(int(self.algo_combo_box_size.get())):
-            rand_num = randint(50,200) # generate random number every time
-            self.array.append(rand_num)
+        for i in range(0,length):
+            self.array.append(num_list[i])
 
         colorArray = ["#333" for i in range(0,len(self.array))]
         self.draw_blocks(colorArray)
@@ -91,7 +93,6 @@ class Window(Frame):
 
 
     def bubble_sort(self):
-
         for i in range(len(self.array)-1):
             for j in range(len(self.array)-1):
                 if self.array[j] > self.array[j+1]:
@@ -102,33 +103,26 @@ class Window(Frame):
 
     
     def insertion_sort(self):
-
         for i in range(1,len(self.array)):
-
             key, j = self.array[i], i-1
-
             while j >= 0 and self.array[j] >= key:
                 self.array[j+1] = self.array[j]
                 current_color = [ "blue" if k == j   else "#333" for k in range(0,len(self.array))]
                 self.draw_blocks(current_color)
                 time.sleep(0.2)
                 j -= 1
-
             self.array[j+1] = key 
             current_color = [ "blue" if k == j   else "#333" for k in range(0,len(self.array))]
             self.draw_blocks(current_color)
             time.sleep(0.2)
 
+
     def selection_sort(self):
-
         for i in range(0,len(self.array)-1):
-
             min_index = i
-
             for j in range(i+1,len(self.array)):
                 if self.array[min_index] > self.array[j]:
                     min_index = j
-            
             self.array[i], self.array[min_index] = self.array[min_index], self.array[i]
             current_color = [ "blue" if k == j   else "#333" for k in range(0,len(self.array))]
             self.draw_blocks(current_color)
@@ -136,10 +130,8 @@ class Window(Frame):
 
 
     def partition(self, low, high):
-
         pivot_element = self.array[high] # pick last element as pivot
         i = (low-1) # index o smallest element
-
         for j in range(low,high):
             if self.array[j] < pivot_element:
                 i = i + 1 # increment index of smallest element
@@ -147,26 +139,72 @@ class Window(Frame):
                 current_color = [ "blue" if k == j   else "#333" for k in range(0,len(self.array))]
                 self.draw_blocks(current_color)
                 time.sleep(0.2)
-
         self.array[i+1], self.array[high] = self.array[high], self.array[i+1]
         current_color = [ "blue" if k == i  else "#333" for k in range(0,len(self.array))]
         self.draw_blocks(current_color)
         time.sleep(0.2)
         return i + 1 # return index of pivot element
         
-
+    # quick sort algorithm implementation
     def quick_sort(self, low, high):
-        
         if low < high:
             pivot = self.partition(low,high) # index of pivot element
             self.quick_sort(low,pivot-1) # before pivot element
             self.quick_sort(pivot+1,high) # after pivot element
 
-    def merge_sort(self):
-        pass 
+    def merge(self,array,l,m,h):
 
-    def merge(self):
-        pass 
+        colors = self.merge_sort_color(array,l,m,h)
+        self.draw_blocks(colors)
+        time.sleep(0.2)
+
+        left = array[l:m+1]
+        right = array[m+1:h+1]
+        i = j = 0
+        k = l
+
+        while (i < len(left) and j < len(right)):
+                if left[i] <= right[j]:
+                   array[k] = left[i]
+                   i = i + 1
+                else:
+                    array[k] = right[j]
+                    j = j + 1
+                k = k + 1
+
+        while (i < len(left)):
+                array[k] = left[i]
+                i = i + 1
+                k = k + 1
+
+        while (j < len(right)):
+                array[k] = right[j]
+                i = i + 1
+                j = k + 1
+                
+        colors = self.merge_sort_color(array,l,m,h)
+        self.draw_blocks(colors)
+        time.sleep(0.2)
+
+    # merge sort algorithm implementation 
+    def merge_sort(self, array, l, h):
+        if l < h:
+            m = (l + h) // 2
+            self.merge_sort(array,l,m)
+            self.merge_sort(array,m+1,h)
+            self.merge(array,l,m,h)
+            
+    def merge_sort_color(self, array, l , m , h):
+        colorArray = []
+        for i in range(len(array)):
+            if i >= l and i <= h:
+                if i >= l and i <= m:
+                    colorArray.append("#333")
+                else:
+                    colorArray.append("pink")
+            else:
+                colorArray.append("green")
+        return colorArray
 
 
     def start_sorting(self):
@@ -181,10 +219,11 @@ class Window(Frame):
             self.quick_sort(0,len(self.array)-1)
             print(self.array)
         elif self.algo_combo_box.get() == "Merge Sort":
-            self.merge_sort()
+            self.merge_sort(self.array, 0, len(self.array)-1)
+            print(self.array)
         
 
-
-master = Tk()
-app = Window(master)
-master.mainloop()
+if __name__=="__main__":
+    master = Tk()
+    app = Window(master)
+    master.mainloop()
